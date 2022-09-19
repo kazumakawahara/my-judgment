@@ -30,3 +30,18 @@ CREATE TABLE `groups`
         REFERENCES `users` (`id`)
         ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT 'グループ';
+
+CREATE TABLE `categories`
+(
+    `id`         INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `group_id`   INT(11) UNSIGNED NOT NULL COMMENT 'グループID',
+    `name`       VARCHAR(20) NOT NULL COMMENT 'カテゴリー名',
+    `detail`     VARCHAR(40) DEFAULT NULL COMMENT 'カテゴリー詳細',
+    `position`   INT(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '並び順',
+    `created_at` DATETIME    NOT NULL COMMENT '作成日時',
+    `created_by` INT(11) UNSIGNED NOT NULL COMMENT '作成ユーザーID',
+    `updated_at` DATETIME    NOT NULL COMMENT '更新日時',
+    `updated_by` INT(11) UNSIGNED NOT NULL COMMENT '更新ユーザーID',
+    PRIMARY KEY (`id`),
+    UNIQUE `uq_categories_1` (`group_id`, `name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT 'カテゴリー';
