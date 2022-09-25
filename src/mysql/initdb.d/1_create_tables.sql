@@ -45,3 +45,30 @@ CREATE TABLE `categories`
     PRIMARY KEY (`id`),
     UNIQUE `uq_categories_1` (`group_id`, `name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT 'カテゴリー';
+
+CREATE TABLE `items`
+(
+    `id`               INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `group_id`         INT(11) UNSIGNED NOT NULL COMMENT 'グループID',
+    `category_id`      INT(11) UNSIGNED NOT NULL COMMENT 'カテゴリーID',
+    `name`             VARCHAR(20) NOT NULL COMMENT 'アイテム名',
+    `area`             CHAR(5)  DEFAULT NULL COMMENT 'アイテムエリア',
+    `feel`             CHAR(5)  DEFAULT NULL COMMENT '気分',
+    `number_of_people` CHAR(5)  DEFAULT NULL COMMENT '人数',
+    `gender_of _pair`  CHAR(5)  DEFAULT NULL COMMENT '性別ペア',
+    `position`         INT(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '並び順',
+    `created_at`       DATETIME    NOT NULL COMMENT '作成日時',
+    `created_by`       INT(11) UNSIGNED NOT NULL COMMENT '作成ユーザーID',
+    `updated_at`       DATETIME    NOT NULL COMMENT '更新日時',
+    `updated_by`       INT(11) UNSIGNED NOT NULL COMMENT '更新ユーザーID',
+    `trashed_at`       DATETIME DEFAULT NULL COMMENT 'ゴミ箱入日時',
+    `trashed_by`       INT(11) UNSIGNED DEFAULT NULL COMMENT 'ゴミ箱に入れたユーザーID',
+    `restored_at`      DATETIME DEFAULT NULL COMMENT 'ゴミ箱復元日時',
+    `restored_by`      INT(11) UNSIGNED DEFAULT NULL COMMENT 'ゴミ箱復元ユーザーID',
+    PRIMARY KEY (`id`),
+    KEY `index_items_1` (`group_id`, `category_id`),
+    UNIQUE `uq_items_1` (`group_id`, `category_id`, `name`),
+    FOREIGN KEY `fk_items_category_id` (`category_id`)
+        REFERENCES `categories` (`id`)
+        ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT 'アイテム';
