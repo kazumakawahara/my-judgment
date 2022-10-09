@@ -72,3 +72,17 @@ CREATE TABLE `items`
         REFERENCES `categories` (`id`)
         ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT 'アイテム';
+
+CREATE TABLE `item_favorites`
+(
+    `id`         INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `group_id`   INT(11) UNSIGNED NOT NULL COMMENT 'グループID',
+    `item_id`    INT(11) UNSIGNED NOT NULL COMMENT 'アイテムID',
+    `use_count`  INT(11) UNSIGNED NOT NULL DEFAULT 0 COMMENT '使用回数',
+    `created_at` DATETIME NOT NULL COMMENT '作成日時',
+    `created_by` INT(11) UNSIGNED NOT NULL COMMENT '作成ユーザーID',
+    `updated_at` DATETIME NOT NULL COMMENT '更新日時',
+    `updated_by` INT(11) UNSIGNED NOT NULL COMMENT '更新ユーザーID',
+    PRIMARY KEY (`id`),
+    UNIQUE `uq_categories_1` (`group_id`, `item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT 'よく使うアイテム';
