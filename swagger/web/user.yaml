@@ -1,0 +1,323 @@
+openapi: 3.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: localhost
+
+info:
+  title: ユーザー
+  version: 1.0.0
+
+paths:
+  /users:
+    post:
+      summary: ユーザー新規登録
+      tags: [ User ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+      requestBody:
+        $ref: "#/components/requestBodies/postMjUserReq"
+      responses:
+        200:
+          $ref: "#/components/responses/postMjUserResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        409:
+          $ref: "#/components/responses/409Conflict"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+  /users/{userID}:
+    get:
+      summary: ユーザー単体取得
+      tags: [ User ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+      responses:
+        200:
+          $ref: "#/components/responses/getMjUserResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    put:
+      summary: ユーザー情報更新
+      tags: [ User ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+      requestBody:
+        $ref: "#/components/requestBodies/putMjUserReq"
+      responses:
+        200:
+          $ref: "#/components/responses/putMjUserResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        409:
+          $ref: "#/components/responses/409Conflict"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+components:
+  parameters:
+    paramApiVersion:
+      name: my-judgment-api-version
+      in: header
+      description: MyJudgmentAPIバージョン
+      required: true
+      schema:
+        type: string
+        example: "1.0"
+
+  requestBodies:
+    postMjUserReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjUser:
+                allOf:
+                  - $ref: "#/components/schemas/mjUserName"
+                  - $ref: "#/components/schemas/mjNullableUserGender"
+                  - $ref: "#/components/schemas/mjUserAddress"
+
+    putMjUserReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjUser:
+                allOf:
+                  - $ref: "#/components/schemas/mjUserName"
+                  - $ref: "#/components/schemas/mjNullableUserGender"
+                  - $ref: "#/components/schemas/mjUserAddress"
+
+  responses:
+    postMjUserResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjUser:
+                allOf:
+                  - $ref: "#/components/schemas/mjUserID"
+
+    getMjUserResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjUser:
+                type: object
+                allOf:
+                  - $ref: "#/components/schemas/mjUserName"
+                  - $ref: "#/components/schemas/mjUserGender"
+                  - $ref: "#/components/schemas/mjUserAddress"
+                  - $ref: "#/components/schemas/mjUserPlan"
+                  - $ref: "#/components/schemas/mjUserCreatedAt"
+
+    putMjUserResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjUser:
+                allOf:
+                  - $ref: "#/components/schemas/mjUserID"
+
+    # エラーレスポンス
+    400BadRequest:
+      description: BadRequest<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InvalidParameter:
+              $ref: '#/components/examples/error400InvalidParameter'
+
+    404NotFound:
+      description: NotFound<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjUserNotFound:
+              $ref: '#/components/examples/error404MjUserNotFound'
+
+    409Conflict:
+      description: Conflict<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjUserNameConflict:
+              $ref: '#/components/examples/error409MjUserNameConflict'
+
+    410Gone:
+      description: Gone<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            Gone:
+              $ref: '#/components/examples/error410Gone'
+
+    500InternalServerError:
+      description: InternalServerError<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InternalServerError:
+              $ref: '#/components/examples/error500InternalServerError'
+
+  schemas:
+    # errorレスポンスボディschema
+    baseError:
+      description: エラーレスポンス
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            detail:
+              type: object
+              nullable: true
+
+    # フィールドschema
+    mjUserID:
+      type: object
+      properties:
+        id:
+          description: ユーザーID
+          type: integer
+          minimum: 1
+          exclusiveMaximum: true
+          example: 1
+
+    mjUserName:
+      type: object
+      properties:
+        name:
+          description: ユーザー名
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: ユーザー1
+
+    mjUserGender:
+      type: object
+      properties:
+        gender:
+          description: ユーザー性別
+          type: string
+          minLength: 5
+          maxLength: 5
+          example: '00101'
+
+    mjNullableUserGender:
+      type: object
+      properties:
+        gender:
+          description: ユーザー性別
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 5
+          example: '00101'
+
+    mjUserAddress:
+      type: object
+      properties:
+        address:
+          description: ユーザー所在地
+          type: string
+          minLength: 5
+          maxLength: 5
+          example: '00001'
+
+    mjUserPlan:
+      type: object
+      properties:
+        plan:
+          description: ユーザー利用プラン
+          type: integer
+          minimum: 0
+          exclusiveMaximum: true
+          example: 0
+
+    mjUserCreatedAt:
+      type: object
+      properties:
+        createdAt:
+          description: ユーザー作成日時(UTC)
+          type: string
+          format: date-time
+          example: '2022-04-01T01:02:30Z'
+
+  examples:
+    error400InvalidParameter:
+      description: 無効なパラメータ
+      value:
+        error:
+          code: InvalidParameter
+          detail: null
+
+    error404MjUserNotFound:
+      description: 指定されたユーザーが存在しない
+      value:
+        error:
+          code: MjUserNotFound
+          detail: null
+
+    error409MjUserNameConflict:
+      description: ユーザー名重複
+      value:
+        error:
+          code: MjUserNameConflict
+          detail: null
+
+    error410Gone:
+      description: ヘッダーで指定されたAPIバージョンがサポート外の場合
+      value:
+        error:
+          code: Gone
+          detail: null
+
+    error500InternalServerError:
+      description: サーバー側での予期しないエラー
+      value:
+        error:
+          code: InternalServerError
+          detail: null
