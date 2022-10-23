@@ -33,8 +33,6 @@ paths:
     get:
       summary: ユーザー単体取得
       tags: [ User ]
-      security:
-        - bearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
       responses:
@@ -52,8 +50,6 @@ paths:
     put:
       summary: ユーザー情報更新
       tags: [ User ]
-      security:
-        - bearerAuth: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
       requestBody:
