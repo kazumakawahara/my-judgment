@@ -1,0 +1,347 @@
+openapi: 3.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: localhost
+
+info:
+  title: グループ
+  version: 1.0.0
+
+paths:
+  /groups:
+    post:
+      summary: グループ新規登録
+      tags: [ Group ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+      requestBody:
+        $ref: "#/components/requestBodies/postMjGroupReq"
+      responses:
+        200:
+          $ref: "#/components/responses/postMjGroupResp"
+        400:
+          $ref: "#/components/responses/400BadRequest2"
+        409:
+          $ref: "#/components/responses/409Conflict"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    get:
+      summary: グループ一覧取得
+      tags: [ Group ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+      responses:
+        200:
+          $ref: "#/components/responses/getMjGroupsResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+  /groups{groupID}:
+    put:
+      summary: グループ更新
+      tags: [ Group ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjGroupID'
+      requestBody:
+        $ref: "#/components/requestBodies/putMjGroupReq"
+      responses:
+        200:
+          $ref: "#/components/responses/putMjGroupResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        409:
+          $ref: "#/components/responses/409Conflict"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    get:
+      summary: グループ単体取得
+      tags: [ Group ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjGroupID'
+      responses:
+        200:
+          $ref: "#/components/responses/getMjGroupResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+components:
+  parameters:
+    paramApiVersion:
+      name: my-judgment-api-version
+      in: header
+      description: MyJudgmentAPIバージョン
+      required: true
+      schema:
+        type: string
+        example: "1.0"
+
+    paramMjGroupID:
+      name: groupID
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        exclusiveMaximum: true
+        example: 1
+
+  requestBodies:
+    postMjGroupReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjGroup:
+                allOf:
+                  - $ref: "#/components/schemas/mjGroupName"
+
+    putMjGroupReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjGroup:
+                allOf:
+                  - $ref: "#/components/schemas/mjGroupName"
+
+  responses:
+    postMjGroupResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjGroup:
+                allOf:
+                  - $ref: "#/components/schemas/mjGroupID"
+
+    getMjGroupsResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjGroups:
+                type: array
+                items:
+                  allOf:
+                    - $ref: "#/components/schemas/mjGroupID"
+                    - $ref: "#/components/schemas/mjGroupName"
+                example:
+                  - id: 3
+                    name: グループ3
+                  - id: 2
+                    name: グループ2
+                  - id: 1
+                    name: グループ1
+
+    putMjGroupResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjGroup:
+                allOf:
+                  - $ref: "#/components/schemas/mjGroupID"
+
+    getMjGroupResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjGroup:
+                allOf:
+                  - $ref: "#/components/schemas/mjGroupID"
+                  - $ref: "#/components/schemas/mjGroupName"
+                  - $ref: "#/components/schemas/mjGroupCreatedAt"
+
+
+    # エラーレスポンス
+    400BadRequest:
+      description: BadRequest<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InvalidParameter:
+              $ref: '#/components/examples/error400InvalidParameter'
+
+    400BadRequest2:
+      description: BadRequest<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InvalidParameter:
+              $ref: '#/components/examples/error400InvalidParameter'
+            RegistrationLimitExceeded:
+              $ref: '#/components/examples/error400RegistrationLimitExceeded'
+
+    404NotFound:
+      description: NotFound<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjGroupNotFound:
+              $ref: '#/components/examples/error404MjGroupNotFound'
+
+    409Conflict:
+      description: Conflict<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjGroupNameConflict:
+              $ref: '#/components/examples/error409MjGroupNameConflict'
+
+    410Gone:
+      description: Gone<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            Gone:
+              $ref: '#/components/examples/error410Gone'
+
+    500InternalServerError:
+      description: InternalServerError<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InternalServerError:
+              $ref: '#/components/examples/error500InternalServerError'
+
+  schemas:
+    # errorレスポンスボディschema
+    baseError:
+      description: エラーレスポンス
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            detail:
+              type: object
+              nullable: true
+
+    # フィールドschema
+    mjGroupID:
+      type: object
+      properties:
+        id:
+          description: グループID
+          type: integer
+          minimum: 1
+          exclusiveMaximum: true
+          example: 1
+
+    mjGroupName:
+      type: object
+      properties:
+        name:
+          description: グループ名
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: グループ1
+
+    mjGroupCreatedAt:
+      type: object
+      properties:
+        createdAt:
+          description: グループ作成日時(UTC)
+          type: string
+          format: date-time
+          example: '2022-04-01T01:02:30Z'
+
+  examples:
+    error400InvalidParameter:
+      description: 無効なパラメータ
+      value:
+        error:
+          code: InvalidParameter
+          detail: null
+
+    error400RegistrationLimitExceeded:
+      description: 登録上限数超過<br>・無料プラン:グループ登録上限1<br>・有料プラン:グループ登録上限無し
+      value:
+        error:
+          code: RegistrationLimitExceeded
+          detail: null
+
+#    TODO: グループ招待機能追加後に必要(Ph2)
+#    error400AffiliationLimitExceeded:
+#      description: 所属上限数超過<br>・無料プラン:カテゴリー所属上限5<br>・有料プラン:カテゴリー所属上限無し
+#      value:
+#        error:
+#          code: AffiliationLimitExceeded
+#          detail: null
+
+    error404MjGroupNotFound:
+      description: 指定されたグループが存在しない
+      value:
+        error:
+          code: MjGroupNotFound
+          detail: null
+
+    error409MjGroupNameConflict:
+      description: グループ名重複
+      value:
+        error:
+          code: MjGroupNameConflict
+          detail: null
+
+    error410Gone:
+      description: ヘッダーで指定されたAPIバージョンがサポート外の場合
+      value:
+        error:
+          code: Gone
+          detail: null
+
+    error500InternalServerError:
+      description: サーバー側での予期しないエラー
+      value:
+        error:
+          code: InternalServerError
+          detail: null
+
