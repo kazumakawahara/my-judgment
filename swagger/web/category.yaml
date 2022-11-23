@@ -1,0 +1,540 @@
+openapi: 3.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: localhost
+
+info:
+  title: カテゴリー
+  version: 1.0.0
+
+paths:
+  /categories:
+    post:
+      summary: カテゴリー新規登録
+      tags: [ Category ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+      requestBody:
+        $ref: "#/components/requestBodies/postMjCategoryReq"
+      responses:
+        200:
+          $ref: "#/components/responses/postMjCategoryResp"
+        400:
+          $ref: "#/components/responses/400BadRequest2"
+        409:
+          $ref: "#/components/responses/409Conflict"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    get:
+      summary: カテゴリー一覧取得
+      tags: [ Category ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+      responses:
+        200:
+          $ref: "#/components/responses/getMjCategoriesResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+  /categories/{categoryID}:
+    put:
+      summary: カテゴリー更新
+      tags: [ Category ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjCategoryID'
+      requestBody:
+        $ref: "#/components/requestBodies/putMjCategoryReq"
+      responses:
+        200:
+          $ref: "#/components/responses/putMjCategoryResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        409:
+          $ref: "#/components/responses/409Conflict"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    get:
+      summary: カテゴリー単体取得
+      tags: [ Category ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjCategoryID'
+      responses:
+        200:
+          $ref: "#/components/responses/getMjCategoryResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    delete:
+      summary: カテゴリー削除
+      tags: [ Category ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjCategoryID'
+      responses:
+        204:
+          description: NoContent
+        400:
+          $ref: "#/components/responses/400BadRequest3"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+  /categories/position:
+    get:
+      summary: 並び替え用カテゴリー一覧取得
+      tags: [ Category ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjLockID'
+      responses:
+        200:
+          $ref: "#/components/responses/getMjCategoryPositionsResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        404:
+          $ref: "#/components/responses/404NotFound2"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    put:
+      summary: カテゴリー並び順更新
+      tags: [ Category ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjLockID'
+      requestBody:
+        $ref: "#/components/requestBodies/putMjCategoryPositionReq"
+      responses:
+        204:
+          description: NoContent
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        404:
+          $ref: "#/components/responses/404NotFound2"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+components:
+  parameters:
+    paramApiVersion:
+      name: my-judgment-api-version
+      in: header
+      description: MyJudgmentAPIバージョン
+      required: true
+      schema:
+        type: string
+        example: "1.0"
+
+    paramMjCategoryID:
+      name: categoryID
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        exclusiveMaximum: true
+        example: 1
+
+    paramMjLockID:
+      name: lock-id
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        exclusiveMaximum: true
+        example: 1
+
+  requestBodies:
+    postMjCategoryReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjCategory:
+                allOf:
+                  - $ref: "#/components/schemas/mjCategoryName"
+                  - $ref: "#/components/schemas/mjNullableCategoryDetail"
+
+    putMjCategoryReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjCategory:
+                allOf:
+                  - $ref: "#/components/schemas/mjCategoryName"
+                  - $ref: "#/components/schemas/mjNullableCategoryDetail"
+
+    putMjCategoryPositionReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/mjCategoriesMaxID"
+              - type: object
+                properties:
+                  mjCategories:
+                    allOf:
+                      - type: array
+                        items:
+                          allOf:
+                            - $ref: "#/components/schemas/mjCategoryID"
+                            - $ref: "#/components/schemas/mjCategoryOldPosition"
+                            - $ref: "#/components/schemas/mjCategoryNewPosition"
+                        example:
+                          - id: 3
+                            oldPosition: 1
+                            newPosition: 2
+                          - id: 1
+                            oldPosition: 0
+                            newPosition: 1
+
+  responses:
+    postMjCategoryResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjCategory:
+                allOf:
+                  - $ref: "#/components/schemas/mjCategoryID"
+
+    getMjCategoriesResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjCategories:
+                type: array
+                items:
+                  allOf:
+                    - $ref: "#/components/schemas/mjCategoryID"
+                    - $ref: "#/components/schemas/mjCategoryName"
+                example:
+                  - id: 3
+                    name: カテゴリー3
+                  - id: 2
+                    name: カテゴリー2
+                  - id: 1
+                    name: カテゴリー1
+
+    putMjCategoryResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjCategory:
+                allOf:
+                  - $ref: "#/components/schemas/mjCategoryID"
+
+    getMjCategoryResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjCategory:
+                type: object
+                allOf:
+                  - $ref: "#/components/schemas/mjCategoryName"
+                  - $ref: "#/components/schemas/mjCategoryDetail"
+
+    getMjCategoryPositionsResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/mjCategoriesMaxID"
+              - type: object
+                properties:
+                  mjCategories:
+                    allOf:
+                      - type: array
+                        items:
+                          allOf:
+                            - $ref: "#/components/schemas/mjCategoryID"
+                            - $ref: "#/components/schemas/mjCategoryName"
+                        example:
+                          - id: 1
+                            name: カテゴリー1
+                          - id: 2
+                            name: カテゴリー2
+                          - id: 3
+                            name: カテゴリー3
+
+    # エラーレスポンス
+    400BadRequest:
+      description: BadRequest<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InvalidParameter:
+              $ref: '#/components/examples/error400InvalidParameter'
+
+    400BadRequest2:
+      description: BadRequest<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InvalidParameter:
+              $ref: '#/components/examples/error400InvalidParameter'
+            RegistrationLimitExceeded:
+              $ref: '#/components/examples/error400RegistrationLimitExceeded'
+
+    400BadRequest3:
+      description: BadRequest<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InvalidParameter:
+              $ref: '#/components/examples/error400InvalidParameter'
+            MjCategoryNotEmpty:
+              $ref: '#/components/examples/error400MjCategoryNotEmpty'
+
+    404NotFound:
+      description: NotFound<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjCategoryNotFound:
+              $ref: '#/components/examples/error404MjCategoryNotFound'
+
+    404NotFound2:
+      description: NotFound<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjLockNotFound:
+              $ref: '#/components/examples/error404MjLockNotFound'
+
+    409Conflict:
+      description: Conflict<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjCategoryNameConflict:
+              $ref: '#/components/examples/error409MjCategoryNameConflict'
+
+    410Gone:
+      description: Gone<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            Gone:
+              $ref: '#/components/examples/error410Gone'
+
+    500InternalServerError:
+      description: InternalServerError<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InternalServerError:
+              $ref: '#/components/examples/error500InternalServerError'
+
+  schemas:
+    # errorレスポンスボディschema
+    baseError:
+      description: エラーレスポンス
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            detail:
+              type: object
+              nullable: true
+
+    # フィールドschema
+    mjCategoryID:
+      type: object
+      properties:
+        id:
+          description: カテゴリーID
+          type: integer
+          minimum: 1
+          exclusiveMaximum: true
+          example: 1
+
+    mjCategoryName:
+      type: object
+      properties:
+        name:
+          description: カテゴリー名
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: カテゴリー1
+
+    mjCategoryDetail:
+      type: object
+      properties:
+        gender:
+          description: カテゴリー詳細
+          type: string
+          minLength: 1
+          maxLength: 40
+          example: カテゴリー詳細1
+
+    mjNullableCategoryDetail:
+      type: object
+      properties:
+        detail:
+          description: カテゴリー詳細
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 40
+          example: カテゴリー詳細1
+
+    mjCategoriesMaxID:
+      type: object
+      properties:
+        mjCategoriesMaxID:
+          description: カテゴリーID<br>並べ替え一覧を初回呼び出した時のリソースの最大ID
+          type: integer
+          minimum: 1
+          exclusiveMaximum: true
+          example: 3
+
+    mjCategoryOldPosition:
+      type: object
+      properties:
+        oldPosition:
+          description: カテゴリー旧並び順<br>並べ替え一覧APIから取得した配列のインデックス
+          type: integer
+          minimum: 1
+          exclusiveMaximum: true
+          example: 1
+
+    mjCategoryNewPosition:
+      type: object
+      properties:
+        newPosition:
+          description: カテゴリー新並び順<br>FE側で並べ替えた後の配列のインデックス（そのリソースを並べ替えた時の並び順で良い、最終状態の並び順の必要はない）
+          type: integer
+          minimum: 1
+          exclusiveMaximum: true
+          example: 1
+
+  examples:
+    error400InvalidParameter:
+      description: 無効なパラメータ
+      value:
+        error:
+          code: InvalidParameter
+          detail: null
+
+    error400RegistrationLimitExceeded:
+      description: 登録上限数超過<br>・無料プラン:カテゴリー登録上限5<br>・有料プラン:カテゴリー登録上限無し
+      value:
+        error:
+          code: RegistrationLimitExceeded
+          detail: null
+
+    error400MjCategoryNotEmpty:
+      description: カテゴリーが空で無い場合は削除不可
+      value:
+        error:
+          code: MjCategoryNotEmpty
+          detail: null
+
+    error404MjCategoryNotFound:
+      description: 指定されたカテゴリーが存在しない
+      value:
+        error:
+          code: MjCategoryNotFound
+          detail: null
+
+    error404MjLockNotFound:
+      description: 指定されたロックが存在しない
+      value:
+        error:
+          code: MjLockNotFound
+          detail: null
+
+    error409MjCategoryNameConflict:
+      description: カテゴリー名重複
+      value:
+        error:
+          code: MjCategoryNameConflict
+          detail: null
+
+    error410Gone:
+      description: ヘッダーで指定されたAPIバージョンがサポート外の場合
+      value:
+        error:
+          code: Gone
+          detail: null
+
+    error500InternalServerError:
+      description: サーバー側での予期しないエラー
+      value:
+        error:
+          code: InternalServerError
+          detail: null
