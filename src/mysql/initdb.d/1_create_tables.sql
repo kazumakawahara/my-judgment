@@ -4,7 +4,8 @@ CREATE TABLE `users`
 (
     `id`          INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
     `name`        VARCHAR(20) NOT NULL COMMENT 'ユーザー名',
-    `gender`      CHAR(5) DEFAULT NULL COMMENT '性別',
+    `birthday`    DATETIME NOT NULL COMMENT '誕生日',
+    `gender`      CHAR(5) NOT NULL COMMENT '性別',
     `address`     CHAR(5) NOT NULL COMMENT '所在地',
     `email`       varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '利用プラン',
     `plan`        int(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT '利用プラン',
