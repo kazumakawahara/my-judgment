@@ -13,6 +13,8 @@ paths:
     post:
       summary: カテゴリー新規登録
       tags: [ Category ]
+      security:
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
       requestBody:
@@ -32,6 +34,8 @@ paths:
     get:
       summary: カテゴリー一覧取得
       tags: [ Category ]
+      security:
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
       responses:
@@ -49,7 +53,7 @@ paths:
       summary: カテゴリー更新
       tags: [ Category ]
       security:
-        - bearerAuth: [ ]
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
         - $ref: '#/components/parameters/paramMjCategoryID'
@@ -72,6 +76,8 @@ paths:
     get:
       summary: カテゴリー単体取得
       tags: [ Category ]
+      security:
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
         - $ref: '#/components/parameters/paramMjCategoryID'
@@ -90,6 +96,8 @@ paths:
     delete:
       summary: カテゴリー削除
       tags: [ Category ]
+      security:
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
         - $ref: '#/components/parameters/paramMjCategoryID'
@@ -110,7 +118,7 @@ paths:
       summary: 並び替え用カテゴリー一覧取得
       tags: [ Category ]
       security:
-        - bearerAuth: [ ]
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
         - $ref: '#/components/parameters/paramMjLockID'
@@ -130,7 +138,7 @@ paths:
       summary: カテゴリー並び順更新
       tags: [ Category ]
       security:
-        - bearerAuth: [ ]
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
         - $ref: '#/components/parameters/paramMjLockID'
@@ -149,6 +157,13 @@ paths:
           $ref: "#/components/responses/500InternalServerError"
 
 components:
+  securitySchemes:
+    bearerByJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: /tokenにて生成したJWT
+
   parameters:
     paramApiVersion:
       name: my-judgment-api-version
