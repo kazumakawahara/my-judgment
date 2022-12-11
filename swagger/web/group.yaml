@@ -13,6 +13,8 @@ paths:
     post:
       summary: グループ新規登録
       tags: [ Group ]
+      security:
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
       requestBody:
@@ -47,6 +49,8 @@ paths:
     put:
       summary: グループ更新
       tags: [ Group ]
+      security:
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
         - $ref: '#/components/parameters/paramMjGroupID'
@@ -69,6 +73,8 @@ paths:
     get:
       summary: グループ単体取得
       tags: [ Group ]
+      security:
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
         - $ref: '#/components/parameters/paramMjGroupID'
@@ -85,6 +91,13 @@ paths:
           $ref: "#/components/responses/500InternalServerError"
 
 components:
+  securitySchemes:
+    bearerByJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: /tokenにて生成したJWT
+
   parameters:
     paramApiVersion:
       name: my-judgment-api-version
