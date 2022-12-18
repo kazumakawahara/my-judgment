@@ -33,6 +33,8 @@ paths:
     get:
       summary: ユーザー単体取得
       tags: [ User ]
+      security:
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
         - $ref: '#/components/parameters/paramMjUserID'
@@ -51,6 +53,8 @@ paths:
     put:
       summary: ユーザー情報更新
       tags: [ User ]
+      security:
+        - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
         - $ref: '#/components/parameters/paramMjUserID'
@@ -71,6 +75,13 @@ paths:
           $ref: "#/components/responses/500InternalServerError"
 
 components:
+  securitySchemes:
+    bearerByJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: /tokenにて生成したJWT
+
   parameters:
     paramApiVersion:
       name: my-judgment-api-version
@@ -102,7 +113,8 @@ components:
               mjUser:
                 allOf:
                   - $ref: "#/components/schemas/mjUserName"
-                  - $ref: "#/components/schemas/mjNullableUserGender"
+                  - $ref: "#/components/schemas/mjUserBirthday"
+                  - $ref: "#/components/schemas/mjUserGender"
                   - $ref: "#/components/schemas/mjUserAddress"
 
     putMjUserReq:
@@ -115,7 +127,7 @@ components:
               mjUser:
                 allOf:
                   - $ref: "#/components/schemas/mjUserName"
-                  - $ref: "#/components/schemas/mjNullableUserGender"
+                  - $ref: "#/components/schemas/mjUserGender"
                   - $ref: "#/components/schemas/mjUserAddress"
 
   responses:
@@ -244,23 +256,20 @@ components:
           maxLength: 20
           example: ユーザー1
 
+    mjUserBirthday:
+      type: object
+      properties:
+        birthday:
+          description: ユーザー誕生日(UTC)
+          type: string
+          example: '2022-05-25'
+
     mjUserGender:
       type: object
       properties:
         gender:
           description: ユーザー性別
           type: string
-          minLength: 5
-          maxLength: 5
-          example: '00101'
-
-    mjNullableUserGender:
-      type: object
-      properties:
-        gender:
-          description: ユーザー性別
-          type: string
-          nullable: true
           minLength: 5
           maxLength: 5
           example: '00101'
