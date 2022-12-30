@@ -24,6 +24,8 @@ paths:
           $ref: "#/components/responses/postMjCategoryResp"
         400:
           $ref: "#/components/responses/400BadRequest2"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
         409:
           $ref: "#/components/responses/409Conflict"
         410:
@@ -38,11 +40,15 @@ paths:
         - bearerByJWT: [ ]
       parameters:
         - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramLimit'
+        - $ref: '#/components/parameters/paramOffset'
       responses:
         200:
           $ref: "#/components/responses/getMjCategoriesResp"
         400:
           $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
         410:
           $ref: "#/components/responses/410Gone"
         500:
@@ -64,6 +70,8 @@ paths:
           $ref: "#/components/responses/putMjCategoryResp"
         400:
           $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
         404:
           $ref: "#/components/responses/404NotFound"
         409:
@@ -86,6 +94,8 @@ paths:
           $ref: "#/components/responses/getMjCategoryResp"
         400:
           $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
         404:
           $ref: "#/components/responses/404NotFound"
         410:
@@ -106,6 +116,8 @@ paths:
           description: NoContent
         400:
           $ref: "#/components/responses/400BadRequest3"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
         404:
           $ref: "#/components/responses/404NotFound"
         410:
@@ -127,6 +139,8 @@ paths:
           $ref: "#/components/responses/getMjCategoryPositionsResp"
         400:
           $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
         404:
           $ref: "#/components/responses/404NotFound2"
         410:
@@ -149,6 +163,8 @@ paths:
           description: NoContent
         400:
           $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
         404:
           $ref: "#/components/responses/404NotFound2"
         410:
@@ -193,6 +209,24 @@ components:
         minimum: 1
         exclusiveMaximum: true
         example: 1
+
+    paramLimit:
+      name: limit
+      in: query
+      required: true
+      schema:
+        type: integer
+        maximum: 50
+        example: 50
+
+    paramOffset:
+      name: offset
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 0
+        example: 0
 
   requestBodies:
     postMjCategoryReq:
@@ -261,21 +295,23 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              mjCategories:
-                type: array
-                items:
-                  allOf:
-                    - $ref: "#/components/schemas/mjCategoryID"
-                    - $ref: "#/components/schemas/mjCategoryName"
-                example:
-                  - id: 3
-                    name: カテゴリー3
-                  - id: 2
-                    name: カテゴリー2
-                  - id: 1
-                    name: カテゴリー1
+            allOf:
+              - $ref: "#/components/schemas/totalCount"
+              - $ref: "#/components/schemas/prevOffset"
+              - $ref: "#/components/schemas/nextOffset"
+              - type: object
+                properties:
+                  mjCategories:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: "#/components/schemas/mjCategoryID"
+                        - $ref: "#/components/schemas/mjCategoryName"
+                    example:
+                      - id: 2
+                        name: カテゴリー2
+                      - id: 1
+                        name: カテゴリー1
 
     putMjCategoryResp:
       description: OK
@@ -360,6 +396,18 @@ components:
             MjCategoryNotEmpty:
               $ref: '#/components/examples/error400MjCategoryNotEmpty'
 
+    401Unauthorized:
+      description: Unauthorized<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            TokenRequired:
+              $ref: '#/components/examples/error401TokenRequired'
+            InvalidToken:
+              $ref: '#/components/examples/error401InvalidToken'
+
     404NotFound:
       description: NotFound<br>全てのエラーコードパターンはExamplesを参照
       content:
@@ -426,6 +474,31 @@ components:
               nullable: true
 
     # フィールドschema
+    totalCount:
+      type: object
+      properties:
+        totalCount:
+          type: integer
+          example: 2
+
+    prevOffset:
+      type: object
+      properties:
+        prevOffset:
+          description: 前のページない場合はnull
+          type: integer
+          nullable: true
+          example: null
+
+    nextOffset:
+      type: object
+      properties:
+        nextOffset:
+          description: 次のページない場合はnull
+          type: integer
+          nullable: true
+          example: null
+
     mjCategoryID:
       type: object
       properties:
@@ -517,6 +590,20 @@ components:
       value:
         error:
           code: MjCategoryNotEmpty
+          detail: null
+
+    error401TokenRequired:
+      description: 認証トークンが必要
+      value:
+        error:
+          code: TokenRequired
+          detail: null
+
+    error401InvalidToken:
+      description: 認証トークンが無効
+      value:
+        error:
+          code: InvalidToken
           detail: null
 
     error404MjCategoryNotFound:
