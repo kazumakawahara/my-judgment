@@ -1,0 +1,471 @@
+openapi: 3.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: localhost
+
+info:
+  title: ロック
+  version: 1.0.0
+
+paths:
+  /locks:
+    post:
+      summary: ロック新規登録
+      description: |-
+        呼び出しタイミングとパラメータは以下を参照。
+
+        | type | target | targetID | タイミング |
+        | ---- | ---- | ---- | ---- |
+        | EDIT | ITEM | 対象アイテムID | アイテム編集 |
+        | SORT | CATEGORY | null | カテゴリー並べ替え |
+      tags: [ Lock ]
+      security:
+        - bearerByJWT: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+      requestBody:
+        $ref: "#/components/requestBodies/postMjLockReq"
+      responses:
+        200:
+          $ref: "#/components/responses/postMjLockResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
+        409:
+          $ref: "#/components/responses/409Conflict"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    get:
+      summary: ロック一覧取得
+      tags: [ Lock ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjLockTypes'
+        - $ref: '#/components/parameters/paramMjItemIDs'
+        - $ref: '#/components/parameters/paramMjCategoryIDs'
+      responses:
+        200:
+          $ref: "#/components/responses/getMjLocksResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+  /locks/{mjLockID}:
+    delete:
+      summary: ロック解除
+      tags: [ Lock ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjLockID'
+      responses:
+        204:
+          description: NoContent
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+components:
+  securitySchemes:
+    bearerByJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: /tokenにて生成したJWT
+
+  parameters:
+    paramApiVersion:
+      name: my-judgment-api-version
+      in: header
+      description: MyJudgmentAPIバージョン
+      required: true
+      schema:
+        type: string
+        example: "1.0"
+
+    paramMjLockID:
+      name: mjLockID
+      in: path
+      description: ロックID
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        example: 1
+
+    paramMjLockTypes:
+      name: lock-types
+      in: query
+      description: ロックタイプ<br>複数指定可能(exp. ?lock-type=EDIT,SORT)
+      required: true
+      schema:
+        type: string
+
+    paramMjItemIDs:
+      name: item-ids
+      in: query
+      description: アイテムIDs<br>ロックタイプにEDITが含まれている場合に付与する<br>複数指定可能(exp. ?item-ids=1,2)
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        example: 1,2
+
+    paramMjCategoryIDs:
+      name: category-ids
+      in: query
+      description: カテゴリーIDs<br>ロックタイプにSORTが含まれている場合に付与する<br>複数指定可能(exp. ?category-ids=1,2)
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        example: 1,2
+
+  requestBodies:
+    postMjLockReq:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjLock:
+                allOf:
+                  - $ref: "#/components/schemas/mjLockType"
+                  - $ref: "#/components/schemas/mjLockTarget"
+                  - $ref: "#/components/schemas/mjLockTargetID"
+                  - $ref: "#/components/schemas/mjLockDevice"
+          examples:
+            EditItemLock:
+              description: アイテム編集ロック
+              value:
+                mjLock:
+                  type: EDIT
+                  target: ITEM
+                  targetID: 1
+                  device: 太郎のiPad Pro
+            SortCategoryLock:
+              description: カテゴリー並べ替えロック
+              value:
+                mjLock:
+                  type: SORT
+                  target: CATEGORY
+                  targetID: null
+                  device: 太郎のiPad Pro
+
+  responses:
+    postMjLockResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjLock:
+                allOf:
+                  - $ref: "#/components/schemas/mjLockID"
+
+    getMjLocksResp:
+      description: OK<br>type=EDIT,target=ITEMの場合はアイテム編集ロック<br>type=SORT,target=CATEGORYの場合はカテゴリー並べ替えロック
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjLocks:
+                type: array
+                items:
+                  type: object
+                  allOf:
+                    - $ref: "#/components/schemas/mjLockType"
+                    - $ref: "#/components/schemas/mjLockTarget"
+                    - $ref: "#/components/schemas/mjLockTargetID"
+                    - $ref: "#/components/schemas/mjLockCreatedAt"
+                    - $ref: "#/components/schemas/mjLockCreatedByEmail"
+                    - $ref: "#/components/schemas/mjLockCreatedByName"
+                    - $ref: "#/components/schemas/mjLockDevice"
+                    - $ref: "#/components/schemas/mjLockExpiresAt"
+
+                example:
+                  - type: EDIT
+                    target: ITEM
+                    targetID: 1
+                    createdAt: '2022-12-00T00:00:00Z'
+                    createdByEmail: 'support2@xxxx.co.jp'
+                    createdByName: "ユーザー2"
+                    device: "次郎のiPad Pro"
+                    expiresAt: null
+                  - type: SORT
+                    target: CATEGORY
+                    targetID: null
+                    createdAt: '2022-12-00T00:30:00Z'
+                    createdByEmail: 'support@xxxx.co.jp'
+                    createdByName: "ユーザー1"
+                    device: "一郎のiPad Pro"
+                    expiresAt: '2022-12-00T01:00:00Z'
+
+    # エラーレスポンス
+    400BadRequest:
+      description: BadRequest<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InvalidParameter:
+              $ref: '#/components/examples/error400InvalidParameter'
+
+    401Unauthorized:
+      description: Unauthorized<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            TokenRequired:
+              $ref: '#/components/examples/error401TokenRequired'
+            InvalidToken:
+              $ref: '#/components/examples/error401InvalidToken'
+
+    404NotFound:
+      description: NotFound<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjLockNotFound:
+              $ref: '#/components/examples/error404MjLockNotFound'
+
+    409Conflict:
+      description: Conflict<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            error409MjLockConflictItemEdit:
+              $ref: '#/components/examples/error409MjLockConflictItemEdit'
+            error409MjLockConflictCategorySort:
+              $ref: '#/components/examples/error409MjLockConflictCategorySort'
+
+    410Gone:
+      description: Gone<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            Gone:
+              $ref: '#/components/examples/error410Gone'
+
+    500InternalServerError:
+      description: InternalServerError<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InternalServerError:
+              $ref: '#/components/examples/error500InternalServerError'
+
+  schemas:
+    # errorレスポンスボディschema
+    baseError:
+      description: エラーレスポンス
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            detail:
+              type: object
+              nullable: true
+
+    # フィールドschema
+    mjLockID:
+      type: object
+      properties:
+        id:
+          description: ロックID
+          type: integer
+          nullable: false
+          minimum: 1
+          example: 1
+
+    mjLockType:
+      type: object
+      properties:
+        type:
+          description: ロックタイプ
+          type: string
+          nullable: false
+          enum:
+            - EDIT
+            - SORT
+          example: EDIT
+
+    mjLockTarget:
+      type: object
+      properties:
+        target:
+          description: ロック対象
+          type: string
+          nullable: false
+          enum:
+            - ITEM
+            - CATEGORY
+          example: ITEM
+
+    mjLockTargetID:
+      type: object
+      properties:
+        targetID:
+          description: ロック対象ID<br>アイテム編集ロックの場合に必要
+          type: integer
+          nullable: true
+          minimum: 1
+          example: 1
+
+    mjLockDevice:
+      type: object
+      properties:
+        device:
+          description: ロックデバイス名
+          type: string
+          nullable: false
+
+    mjLockCreatedAt:
+      type: object
+      properties:
+        createdAt:
+          description: ロック作成日時(UTC)
+          type: string
+          format: date-time
+          example: '2022-12-00T00:00:00Z'
+
+    mjLockCreatedByEmail:
+      type: object
+      properties:
+        createdByEmail:
+          description: ロック作成ユーザー名Email
+          type: string
+
+    mjLockCreatedByName:
+      type: object
+      properties:
+        createdByName:
+          description: ロック作成ユーザー名
+          type: string
+
+    mjLockExpiresAt:
+      type: object
+      properties:
+        expiresAt:
+          description: ロック有効期限(UTC)<br>LockTypeがEDITの場合はnull
+          type: string
+          format: date-time
+          nullable: true
+          example: '2022-12-00T00:30:00Z'
+
+  examples:
+    error400InvalidParameter:
+      description: 無効なパラメータ
+      value:
+        error:
+          code: InvalidParameter
+          detail: null
+
+    error401TokenRequired:
+      description: 認証トークンが必要
+      value:
+        error:
+          code: TokenRequired
+          detail: null
+
+    error401InvalidToken:
+      description: 認証トークンが無効
+      value:
+        error:
+          code: InvalidToken
+          detail: null
+
+    error404MjLockNotFound:
+      description: 指定されたロックが存在しない
+      value:
+        error:
+          code: MjLockNotFound
+          detail: null
+
+    error409MjLockConflictItemEdit:
+      description: |-
+        アイテム編集ロックコンフリクト。エラー発生パターンは以下の通り<br>
+        - アイテム編集ロックを新規登録する時に、同アイテムへの編集ロックがすでに存在している。
+        - アイテムをゴミ箱に入れる時に、同アイテムへの編集ロックがすでに存在している。
+      value:
+        error:
+          code: MjLockConflict
+          detail:
+            mjLock:
+              type: EDIT
+              target: ITEM
+              createdAt: '2022-12-00T00:00:00Z'
+              createdByEmail: 'support@xxxx.co.jp'
+              createdByName: '山田　太郎'
+              device: 太郎のiPad Pro
+              expiresAt: null
+
+    error409MjLockConflictCategorySort:
+      description: |-
+       カテゴリー並べ替えロックコンフリクト。エラー発生パターンは以下の通り<br>
+        - カテゴリー並べ替えロックを新規登録する時に、カテゴリー並べ替えロックがすでに存在している。
+      value:
+        error:
+          code: MjLockConflict
+          detail:
+            mjLock:
+              type: SORT
+              target: CATEGORY
+              createdAt: '2022-12-00T00:00:00Z'
+              createdByEmail: 'support@xxxx.co.jp'
+              createdByName: '山田　太郎'
+              device: 太郎のiPad Pro
+              expiresAt: '2022-12-00T00:30:00Z'
+
+    error410Gone:
+      description: ヘッダーで指定されたAPIバージョンがサポート外の場合
+      value:
+        error:
+          code: Gone
+          detail: null
+
+    error500InternalServerError:
+      description: サーバー側での予期しないエラー
+      value:
+        error:
+          code: InternalServerError
+          detail: null
+
+
