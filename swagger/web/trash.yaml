@@ -1,0 +1,401 @@
+openapi: 3.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: localhost
+
+info:
+  title: ゴミ箱
+  version: 1.0.0
+
+paths:
+  /trash/categories/{categoryID}items{itemID}:
+    post:
+      summary: アイテムをゴミ箱に入れる
+      tags: [ Trash ]
+      security:
+        - bearerByJWT: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjCategoryID'
+        - $ref: '#/components/parameters/paramMjItemID'
+        - $ref: '#/components/parameters/paramMjLockID'
+      responses:
+        204:
+          description: NoContent
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        409:
+          $ref: "#/components/responses/409Conflict"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+  /trash/categories/{categoryID}items:
+    get:
+      summary: ゴミ箱入りアイテム一覧取得
+      tags: [ Trash ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjCategoryID'
+      responses:
+        200:
+          $ref: "#/components/responses/getTrashMjItemsResp"
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
+        404:
+          $ref: "#/components/responses/404NotFound"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    put:
+      summary: ゴミ箱からアイテム一括復元
+      tags: [ Trash ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjCategoryID'
+        - $ref: '#/components/parameters/paramMjItemsIDs'
+      responses:
+        204:
+          description: NoContent
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
+        404:
+          $ref: "#/components/responses/404NotFound2"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+    delete:
+      summary: ゴミ箱からアイテム一括削除
+      tags: [ Trash ]
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - $ref: '#/components/parameters/paramApiVersion'
+        - $ref: '#/components/parameters/paramMjCategoryID'
+        - $ref: '#/components/parameters/paramMjItemsIDs'
+      responses:
+        204:
+          description: NoContent
+        400:
+          $ref: "#/components/responses/400BadRequest"
+        401:
+          $ref: "#/components/responses/401Unauthorized"
+        404:
+          $ref: "#/components/responses/404NotFound2"
+        410:
+          $ref: "#/components/responses/410Gone"
+        500:
+          $ref: "#/components/responses/500InternalServerError"
+
+components:
+  securitySchemes:
+    bearerByJWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: /tokenにて生成したJWT
+
+  parameters:
+    paramApiVersion:
+      name: my-judgment-api-version
+      in: header
+      description: MyJudgmentAPIバージョン
+      required: true
+      schema:
+        type: string
+        example: "1.0"
+
+    paramMjCategoryID:
+      name: categoryID
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        exclusiveMaximum: true
+        example: 1
+
+    paramMjItemID:
+      name: itemID
+      in: path
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        exclusiveMaximum: true
+        example: 1
+
+    paramMjLockID:
+      name: lock-id
+      in: query
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        exclusiveMaximum: true
+        example: 1
+
+    paramMjItemsIDs:
+      name: ids
+      in: query
+      description: ゴミ箱から復元又はゴミ箱から削除の対象アイテムID
+      required: true
+      schema:
+        type: string
+        minLength: 1
+        example: 1,2,3
+
+  responses:
+    getTrashMjItemsResp:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              mjItems:
+                type: array
+                items:
+                  type: object
+                  allOf:
+                    - $ref: "#/components/schemas/mjItemID"
+                    - $ref: "#/components/schemas/mjItemName"
+                    - $ref: "#/components/schemas/mjItemTrashedAt"
+                    - type: object
+                      properties:
+                        mjCategory:
+                          type: object
+                          allOf:
+                            - $ref: "#/components/schemas/mjCategoryID"
+                            - $ref: "#/components/schemas/mjCategoryName"
+          example:
+            mjItems:
+              - id: 2
+                name: アイテム2
+                trashedAt: '2022-12-00T00:00:00Z'
+                mjCategory:
+                  id: 2
+                  name: カテゴリー2
+              - id: 1
+                name: アイテム1
+                trashedAt: '2022-12-00T00:30:00Z'
+                mjCategory:
+                  id: 1
+                  name: カテゴリー1
+
+    # エラーレスポンス
+    400BadRequest:
+      description: BadRequest<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InvalidParameter:
+              $ref: '#/components/examples/error400InvalidParameter'
+
+    401Unauthorized:
+      description: Unauthorized<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            TokenRequired:
+              $ref: '#/components/examples/error401TokenRequired'
+            InvalidToken:
+              $ref: '#/components/examples/error401InvalidToken'
+
+    404NotFound:
+      description: NotFound<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjCategoryNotFound:
+              $ref: '#/components/examples/error404MjCategoryNotFound'
+            MjItemNotFound:
+              $ref: '#/components/examples/error404MjItemNotFound'
+            MjLockNotFound:
+              $ref: '#/components/examples/error404MjLockNotFound'
+
+    404NotFound2:
+      description: NotFound<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjCategoryNotFound:
+              $ref: '#/components/examples/error404MjCategoryNotFound'
+
+    409Conflict:
+      description: Conflict<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            MjLockConflictItemEdit:
+              $ref: 'lock.yaml#/components/examples/error409MjLockConflictItemEdit'
+
+    410Gone:
+      description: Gone<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            Gone:
+              $ref: '#/components/examples/error410Gone'
+
+    500InternalServerError:
+      description: InternalServerError<br>全てのエラーコードパターンはExamplesを参照
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/baseError'
+          examples:
+            InternalServerError:
+              $ref: '#/components/examples/error500InternalServerError'
+
+  schemas:
+    # errorレスポンスボディschema
+    baseError:
+      description: エラーレスポンス
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            detail:
+              type: object
+              nullable: true
+
+    # フィールドschema
+    mjItemID:
+      type: object
+      properties:
+        id:
+          description: アイテムID
+          type: integer
+          minimum: 1
+          exclusiveMaximum: true
+          example: 1
+
+    mjItemName:
+      type: object
+      properties:
+        name:
+          description: アイテム名
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: アイテム1
+
+    mjItemTrashedAt:
+      type: object
+      properties:
+        trashedAt:
+          description: アイテムゴミ箱入り日時(UTC)
+          type: string
+          format: date-time
+          example: '2022-12-00T00:00:00Z'
+
+    mjCategoryID:
+      type: object
+      properties:
+        id:
+          description: カテゴリーID
+          type: integer
+          minimum: 1
+          exclusiveMaximum: true
+          example: 1
+
+    mjCategoryName:
+      type: object
+      properties:
+        name:
+          description: カテゴリー名
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: カテゴリー1
+
+  examples:
+    error400InvalidParameter:
+      description: 無効なパラメータ
+      value:
+        error:
+          code: InvalidParameter
+          detail: null
+
+    error401TokenRequired:
+      description: 認証トークンが必要
+      value:
+        error:
+          code: TokenRequired
+          detail: null
+
+    error401InvalidToken:
+      description: 認証トークンが無効
+      value:
+        error:
+          code: InvalidToken
+          detail: null
+
+    error404MjCategoryNotFound:
+      description: 指定されたアイテムが存在しない
+      value:
+        error:
+          code: MjCategoryNotFound
+          detail: null
+
+    error404MjItemNotFound:
+      description: 指定されたアイテムが存在しない
+      value:
+        error:
+          code: MjItemNotFound
+          detail: null
+
+    error404MjLockNotFound:
+      description: 指定されたロックが存在しない
+      value:
+        error:
+          code: MjLockNotFound
+          detail: null
+
+    error410Gone:
+      description: ヘッダーで指定されたAPIバージョンがサポート外の場合
+      value:
+        error:
+          code: Gone
+          detail: null
+
+    error500InternalServerError:
+      description: サーバー側での予期しないエラー
+      value:
+        error:
+          code: InternalServerError
+          detail: null
