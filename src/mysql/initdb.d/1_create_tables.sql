@@ -16,9 +16,10 @@ CREATE TABLE `users`
     `updated_by`  INT(11) UNSIGNED NOT NULL COMMENT '更新ユーザーID',
     `deleted_at`  DATETIME DEFAULT NULL COMMENT '削除日時',
     `deleted_by`  INT(11) UNSIGNED DEFAULT NULL COMMENT '削除ユーザーID',
+    `deleted_uts` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '削除日時UNIX NANOタイムスタンプ',
     PRIMARY KEY (`id`),
-    UNIQUE `uq_users_1` (`name`, `email`),
-    UNIQUE `uq_users_2` (`password`, `deleted_uts`)
+    KEY `index_users_1` (`name`, `email`),
+    UNIQUE `uq_users_1` (`email`, `deleted_uts`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT 'ユーザー';
 
 CREATE TABLE `groups`
