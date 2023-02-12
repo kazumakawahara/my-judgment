@@ -7,7 +7,8 @@ CREATE TABLE `users`
     `birthday`    DATETIME NOT NULL COMMENT '誕生日',
     `gender`      CHAR(5) NOT NULL COMMENT '性別',
     `address`     CHAR(5) NOT NULL COMMENT '所在地',
-    `email`       varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT '利用プラン',
+    `email`       varchar(255) COLLATE utf8_unicode_ci NOT NULL COMMENT 'メールアドレス',
+    `password`    varchar(16)  NOT NULL COMMENT 'パスワード',
     `plan`        int(11) UNSIGNED NOT NULL DEFAULT '0' COMMENT '利用プラン',
     `created_at`  DATETIME NOT NULL COMMENT '作成日時',
     `created_by`  INT(11) UNSIGNED NOT NULL COMMENT '作成ユーザーID',
@@ -17,7 +18,8 @@ CREATE TABLE `users`
     `deleted_by`  INT(11) UNSIGNED DEFAULT NULL COMMENT '削除ユーザーID',
     `deleted_uts` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '削除日時UNIX NANOタイムスタンプ',
     PRIMARY KEY (`id`),
-    UNIQUE `uq_users_1` (`name`, `email`, `deleted_uts`)
+    KEY `index_users_1` (`name`, `email`),
+    UNIQUE `uq_users_1` (`email`, `deleted_uts`),
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT 'ユーザー';
 
 CREATE TABLE `groups`
