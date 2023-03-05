@@ -1,0 +1,13 @@
+name: MyJudgment test
+on:
+  pull_request:
+    paths-ignore:
+      - src/**
+      - .github/workflows/ci.yaml
+      - .github/workflows/.golangci.yaml
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No test required" '
