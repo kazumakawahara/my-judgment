@@ -1,0 +1,33 @@
+name: MyJudgment test
+on:
+  pull_request:
+    paths:
+      - src/**
+      - .github/workflows/ci.yaml
+      - .github/workflows/.golangci.yaml
+defaults:
+  run:
+    shell: bash
+    working-directory: src
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go 1.19
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.19'
+
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.50
+          working-directory: src
+          args: --config ../.github/.golangci.yaml
+
+      - name: Run tests
+        run: go test -race ./...
