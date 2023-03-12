@@ -116,6 +116,7 @@ components:
                   - $ref: "#/components/schemas/mjUserBirthday"
                   - $ref: "#/components/schemas/mjUserGender"
                   - $ref: "#/components/schemas/mjUserAddress"
+                  - $ref: "#/components/schemas/mjUserEmail"
 
     putMjUserReq:
       required: true
@@ -129,6 +130,8 @@ components:
                   - $ref: "#/components/schemas/mjUserName"
                   - $ref: "#/components/schemas/mjUserGender"
                   - $ref: "#/components/schemas/mjUserAddress"
+                  - $ref: "#/components/schemas/mjUserEmail"
+                  - $ref: "#/components/schemas/mjUserPassword"
 
   responses:
     postMjUserResp:
@@ -141,6 +144,7 @@ components:
               mjUser:
                 allOf:
                   - $ref: "#/components/schemas/mjUserID"
+                  - $ref: "#/components/schemas/mjUserPassword"
 
     getMjUserResp:
       description: OK
@@ -199,6 +203,8 @@ components:
           examples:
             MjUserNameConflict:
               $ref: '#/components/examples/error409MjUserNameConflict'
+            MjUserEmailConflict:
+              $ref: '#/components/examples/error409MjUserEmailConflict'
 
     410Gone:
       description: Gone<br>全てのエラーコードパターンはExamplesを参照
@@ -260,9 +266,10 @@ components:
       type: object
       properties:
         birthday:
-          description: ユーザー誕生日(UTC)
+          description: ユーザー生年月日
           type: string
-          example: '2022-05-25'
+          format: date-time
+          example: "1991-06-15T00:00:00Z"
 
     mjUserGender:
       type: object
@@ -283,6 +290,25 @@ components:
           minLength: 5
           maxLength: 5
           example: '00001'
+
+    mjUserEmail:
+      type: object
+      properties:
+        email:
+          description: ユーザーEメール
+          type: string
+          minLength: 1
+          example: support@xxxx.co.jp
+
+    mjUserPassword:
+      type: object
+      properties:
+        password:
+          description: ユーザーパスワード
+          type: string
+          minLength: 8
+          maxLength: 16
+          example: 1234abcd
 
     mjUserPlan:
       type: object
@@ -323,6 +349,13 @@ components:
       value:
         error:
           code: MjUserNameConflict
+          detail: null
+
+    error409MjUserEmailConflict:
+      description: ユーザーEメール重複
+      value:
+        error:
+          code: MjUserEmailConflict
           detail: null
 
     error410Gone:
