@@ -19,7 +19,7 @@ CREATE TABLE `users`
     `deleted_uts` BIGINT(20) UNSIGNED NOT NULL DEFAULT 0 COMMENT '削除日時UNIX NANOタイムスタンプ',
     PRIMARY KEY (`id`),
     KEY `index_users_1` (`name`, `email`),
-    UNIQUE `uq_users_1` (`email`, `deleted_uts`),
+    UNIQUE `uq_users_1` (`email`, `deleted_uts`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT 'ユーザー';
 
 CREATE TABLE `groups`

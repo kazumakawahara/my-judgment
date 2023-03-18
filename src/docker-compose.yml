@@ -7,10 +7,11 @@ services:
     command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
-      MYSQL_DATABASE: my_judgment_db
-      MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: test
+      MYSQL_ROOT_PASSWORD: root
       MYSQL_PASSWORD: test
+      MYSQL_PROTOCOL: tcp(127.0.0.1:3356)
+      MYSQL_DATABASE: my_judgment_db
       TZ: "Asia/Tokyo"
     ports:
       - "3356:3306"
