@@ -13,11 +13,11 @@ test:
 
 # goldenテストデータ更新
 test-update:
-	@ go test ./... -update
+	@ go test ./interfaces/handler/... -update
 
 # goldenテストデータを全て削除して新規作成
 test-clean:
-	@ go test ./... -update -clean
+	@ go test ./interfaces/handler/... -clean
 
 gen:
 	@ go generate ./...
