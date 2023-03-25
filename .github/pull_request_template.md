@@ -2,39 +2,41 @@
 - XXX
 
 ## 詳細
-- XXX
+- [ ] XXX
 
 ## Request, Response 例
-<!--
-### Request
-Method: GET  
-Path: /example
-
 <details>
-<summary>body(click):</summary>
+<summary>正常系</summary>
+
+リクエスト
+```
+POST XXX
+```
+
+レスポンス
+```
+200 OK
 
 ```
-{
-    "key": "value"
-}
-```
-
 </details>
 
-### Response
-
 <details>
-<summary>body(click):</summary>
+<summary>異常系</summary>
+
+リクエスト
+```
+POST XXX
+```
+
+レスポンス
+```
+409 Conflict
 
 ```
-{
-    "key": "value"
-}
-```
-
 </details>
--->
 
 
 ## 検証方法
-- XXX
+- [x] ローカル環境にて手動動作確認
+- [x] `make lint`
+- [ ] `make test`
