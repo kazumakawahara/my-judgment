@@ -8,22 +8,6 @@ import (
 type Plan int
 
 func NewPlan(plan int) (Plan, error) {
-	if plan < 1 {
-		return 0, mjerr.Wrap(
-			nil,
-			mjerr.WithOriginError(apperr.InvalidParameter),
-			mjerr.WithLogDetail(
-				map[string]interface{}{
-					"plan": plan,
-				},
-			),
-		)
-	}
-
-	return Plan(plan), nil
-}
-
-func NewNotPersistedPlan(plan int) (Plan, error) {
 	if plan < 0 {
 		return 0, mjerr.Wrap(
 			nil,

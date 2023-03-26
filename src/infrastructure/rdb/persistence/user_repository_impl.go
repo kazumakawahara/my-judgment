@@ -59,6 +59,33 @@ func (r *userRepository) ExistsUserByPassword(ctx context.Context, passwordVO us
 	return count > 0, nil
 }
 
+func (r *userRepository) FetchUserByID(ctx context.Context, userIDVO uservo.ID) (*userdm.User, error) {
+	conn, err := rdb.DBConnFromCtx(ctx)
+	if err != nil {
+		return nil, mjerr.Wrap(err)
+	}
+
+	userDS := datasource.User{}
+
+	if res := conn.
+		Scopes(scopeForUser()).
+		Where("id = ?", userIDVO.Value()).
+		Take(&userDS); res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return nil, mjerr.Wrap(res.Error, mjerr.WithOriginError(apperr.MjUserNotFound))
+		}
+
+		return nil, mjerr.Wrap(res.Error, mjerr.WithOriginError(apperr.InternalServerError))
+	}
+
+	userEntity, err := userDS.ReconstructUserEntity()
+	if err != nil {
+		return nil, mjerr.Wrap(err)
+	}
+
+	return userEntity, nil
+}
+
 func (r *userRepository) FetchUserIDByName(ctx context.Context, nameVO uservo.Name) (uservo.ID, error) {
 	conn, err := rdb.DBConnFromCtx(ctx)
 	if err != nil {
