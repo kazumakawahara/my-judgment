@@ -1,0 +1,11 @@
+{
+  "mjUser": {
+    "name": "ユーザー1",
+    "birthday": "2023-04-10T00:00:00Z",
+    "gender": "00101",
+    "address": "00001",
+    "email": "support1@xxxx.co.jp",
+    "plan": 0,
+    "createdAt": "2023-04-10T00:00:00Z"
+  }
+}
