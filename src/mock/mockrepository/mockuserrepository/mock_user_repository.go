@@ -66,6 +66,21 @@ func (mr *MockRepositoryMockRecorder) ExistsUserByPassword(ctx, passwordVO inter
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExistsUserByPassword", reflect.TypeOf((*MockRepository)(nil).ExistsUserByPassword), ctx, passwordVO)
 }
 
+// FetchUserByID mocks base method.
+func (m *MockRepository) FetchUserByID(ctx context.Context, userIDVO uservo.ID) (*userdm.User, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FetchUserByID", ctx, userIDVO)
+	ret0, _ := ret[0].(*userdm.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FetchUserByID indicates an expected call of FetchUserByID.
+func (mr *MockRepositoryMockRecorder) FetchUserByID(ctx, userIDVO interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchUserByID", reflect.TypeOf((*MockRepository)(nil).FetchUserByID), ctx, userIDVO)
+}
+
 // FetchUserIDByEmail mocks base method.
 func (m *MockRepository) FetchUserIDByEmail(ctx context.Context, emailVO uservo.Email) (uservo.ID, error) {
 	m.ctrl.T.Helper()
