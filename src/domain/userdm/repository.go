@@ -1,3 +1,4 @@
+//go:generate mockgen -source=$GOFILE -destination=../../mock/mockrepository/mockuserrepository/mock_user_$GOFILE -package=mockuserrepository
 package userdm
 
 import (
@@ -9,6 +10,7 @@ import (
 type Repository interface {
 	CreateUser(ctx context.Context, userEntity *User) (uservo.ID, error)
 	ExistsUserByPassword(ctx context.Context, passwordVO uservo.Password) (bool, error)
+	FetchUserByID(ctx context.Context, userIDVO uservo.ID) (*User, error)
 	FetchUserIDByName(ctx context.Context, nameVO uservo.Name) (uservo.ID, error)
 	FetchUserIDByEmail(ctx context.Context, emailVO uservo.Email) (uservo.ID, error)
 }

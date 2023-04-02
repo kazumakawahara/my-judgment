@@ -45,4 +45,12 @@ func userRouterForWeb(mjRouter *echo.Group) {
 	mjRouter.POST("/users", func(c echo.Context) error {
 		return createUserHandler.CreateUser(c.(*customcontext.CustomContext))
 	})
+
+	// ユーザー単体取得
+	fetchUserUsecase := userusecase.NewFetchUserUsecase(userRepository)
+	fetchUserHandler := userhandler.NewFetchUserHandler(fetchUserUsecase)
+
+	mjRouter.GET("/users/:userID", func(c echo.Context) error {
+		return fetchUserHandler.FetchUser(c.(*customcontext.CustomContext))
+	})
 }

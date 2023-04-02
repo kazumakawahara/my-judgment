@@ -157,8 +157,10 @@ components:
                 type: object
                 allOf:
                   - $ref: "#/components/schemas/mjUserName"
+                  - $ref: "#/components/schemas/mjUserBirthday"
                   - $ref: "#/components/schemas/mjUserGender"
                   - $ref: "#/components/schemas/mjUserAddress"
+                  - $ref: "#/components/schemas/mjUserEmail"
                   - $ref: "#/components/schemas/mjUserPlan"
                   - $ref: "#/components/schemas/mjUserCreatedAt"
 

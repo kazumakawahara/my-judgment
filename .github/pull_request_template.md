@@ -2,7 +2,8 @@
 - XXX
 
 ## 詳細
-- [ ] XXX
+- [x] API作成
+- [ ] 単体テスト作成
 
 ## Request, Response 例
 <details>
