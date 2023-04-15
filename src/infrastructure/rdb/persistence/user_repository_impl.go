@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"my-judgment/common/apperr"
 	"my-judgment/common/mjerr"
@@ -59,7 +60,7 @@ func (r *userRepository) ExistsUserByPassword(ctx context.Context, passwordVO us
 	return count > 0, nil
 }
 
-func (r *userRepository) FetchUserByID(ctx context.Context, userIDVO uservo.ID) (*userdm.User, error) {
+func (r *userRepository) FetchUserByID(ctx context.Context, userIDVO uservo.ID, withLock bool) (*userdm.User, error) {
 	conn, err := rdb.DBConnFromCtx(ctx)
 	if err != nil {
 		return nil, mjerr.Wrap(err)
@@ -67,10 +68,15 @@ func (r *userRepository) FetchUserByID(ctx context.Context, userIDVO uservo.ID) 
 
 	userDS := datasource.User{}
 
-	if res := conn.
+	query := conn.
 		Scopes(scopeForUser()).
-		Where("id = ?", userIDVO.Value()).
-		Take(&userDS); res.Error != nil {
+		Where("id = ?", userIDVO.Value())
+
+	if withLock {
+		query = query.Clauses(clause.Locking{Strength: "UPDATE"})
+	}
+
+	if res := query.Take(&userDS); res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, mjerr.Wrap(res.Error, mjerr.WithOriginError(apperr.MjUserNotFound))
 		}
@@ -140,6 +146,33 @@ func (r *userRepository) FetchUserIDByEmail(ctx context.Context, emailVO uservo.
 	}
 
 	return idVO, nil
+}
+
+func (r *userRepository) UpdateUser(ctx context.Context, userEntity *userdm.User) error {
+	conn, err := rdb.DBConnFromCtx(ctx)
+	if err != nil {
+		return mjerr.Wrap(err)
+	}
+
+	userDS := &datasource.User{
+		Name:      userEntity.Name().Value(),
+		Gender:    userEntity.Gender().Value(),
+		Address:   userEntity.Address().Value(),
+		Email:     userEntity.Email().Value(),
+		Password:  userEntity.Password().Value(),
+		UpdatedAt: userEntity.UpdatedAt().Value(),
+		UpdatedBy: userEntity.UpdatedBy().Value(),
+	}
+
+	if res := conn.
+		Scopes(scopeForUser()).
+		Select("name", "gender", "address", "email", "password", "updated_at", "updated_by").
+		Where("id = ?", userEntity.ID().Value()).
+		Updates(userDS); res.Error != nil {
+		return mjerr.Wrap(res.Error, mjerr.WithOriginError(apperr.InternalServerError))
+	}
+
+	return nil
 }
 
 func scopeForUser() func(db *gorm.DB) *gorm.DB {

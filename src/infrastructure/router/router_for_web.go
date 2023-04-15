@@ -53,4 +53,12 @@ func userRouterForWeb(mjRouter *echo.Group) {
 	mjRouter.GET("/users/:userID", func(c echo.Context) error {
 		return fetchUserHandler.FetchUser(c.(*customcontext.CustomContext))
 	})
+
+	// ユーザー情報更新
+	updateUserUsecase := userusecase.NewUpdateUserUsecase(userRepository)
+	updateUserHandler := userhandler.NewUpdateUserHandler(updateUserUsecase)
+
+	mjRouter.PUT("/users/:userID", func(c echo.Context) error {
+		return updateUserHandler.UpdateUser(c.(*customcontext.CustomContext))
+	})
 }

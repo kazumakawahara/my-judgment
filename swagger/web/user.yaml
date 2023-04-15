@@ -127,11 +127,11 @@ components:
             properties:
               mjUser:
                 allOf:
-                  - $ref: "#/components/schemas/mjUserName"
-                  - $ref: "#/components/schemas/mjUserGender"
-                  - $ref: "#/components/schemas/mjUserAddress"
-                  - $ref: "#/components/schemas/mjUserEmail"
-                  - $ref: "#/components/schemas/mjUserPassword"
+                  - $ref: "#/components/schemas/mjNullableUserName"
+                  - $ref: "#/components/schemas/mjNullableUserGender"
+                  - $ref: "#/components/schemas/mjNullableUserAddress"
+                  - $ref: "#/components/schemas/mjNullableUserEmail"
+                  - $ref: "#/components/schemas/mjNullableUserPassword"
 
   responses:
     postMjUserResp:
@@ -264,6 +264,17 @@ components:
           maxLength: 20
           example: ユーザー1
 
+    mjNullableUserName:
+      type: object
+      properties:
+        name:
+          description: ユーザー名
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 20
+          example: ユーザー1
+
     mjUserBirthday:
       type: object
       properties:
@@ -283,12 +294,34 @@ components:
           maxLength: 5
           example: '00101'
 
+    mjNullableUserGender:
+      type: object
+      properties:
+        gender:
+          description: ユーザー性別
+          type: string
+          nullable: true
+          minLength: 5
+          maxLength: 5
+          example: '00101'
+
     mjUserAddress:
       type: object
       properties:
         address:
           description: ユーザー所在地
           type: string
+          minLength: 5
+          maxLength: 5
+          example: '00001'
+
+    mjNullableUserAddress:
+      type: object
+      properties:
+        address:
+          description: ユーザー所在地
+          type: string
+          nullable: true
           minLength: 5
           maxLength: 5
           example: '00001'
@@ -302,12 +335,33 @@ components:
           minLength: 1
           example: support@xxxx.co.jp
 
+    mjNullableUserEmail:
+      type: object
+      properties:
+        email:
+          description: ユーザーEメール
+          type: string
+          nullable: true
+          minLength: 1
+          example: support@xxxx.co.jp
+
     mjUserPassword:
       type: object
       properties:
         password:
           description: ユーザーパスワード
           type: string
+          minLength: 8
+          maxLength: 16
+          example: 1234abcd
+
+    mjNullableUserPassword:
+      type: object
+      properties:
+        password:
+          description: ユーザーパスワード
+          type: string
+          nullable: true
           minLength: 8
           maxLength: 16
           example: 1234abcd
