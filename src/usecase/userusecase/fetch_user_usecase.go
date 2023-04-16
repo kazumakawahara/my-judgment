@@ -31,7 +31,7 @@ func (u *fetchUserUsecase) FetchUser(ctx context.Context, in *userinput.FetchUse
 		return nil, mjerr.Wrap(err)
 	}
 
-	userEntity, err := u.userRepository.FetchUserByID(ctx, userIDVO)
+	userEntity, err := u.userRepository.FetchUserByID(ctx, userIDVO, false)
 	if err != nil {
 		return nil, mjerr.Wrap(err)
 	}
