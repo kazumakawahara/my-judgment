@@ -63,7 +63,7 @@ func Test_fetchUserUsecase_FetchUser(t *testing.T) {
 					return err
 				}
 
-				f.userRepository.EXPECT().FetchUserByID(gomock.Any(), userIDVO).Return(userEntity, nil)
+				f.userRepository.EXPECT().FetchUserByID(gomock.Any(), userIDVO, false).Return(userEntity, nil)
 
 				return nil
 			},
@@ -96,7 +96,7 @@ func Test_fetchUserUsecase_FetchUser(t *testing.T) {
 
 				err = mjerr.Wrap(nil, mjerr.WithOriginError(apperr.MjUserNotFound))
 
-				f.userRepository.EXPECT().FetchUserByID(gomock.Any(), userIDVO).Return(nil, err)
+				f.userRepository.EXPECT().FetchUserByID(gomock.Any(), userIDVO, false).Return(nil, err)
 
 				return nil
 			},
