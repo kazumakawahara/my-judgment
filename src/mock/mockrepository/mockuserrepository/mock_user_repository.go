@@ -67,18 +67,18 @@ func (mr *MockRepositoryMockRecorder) ExistsUserByPassword(ctx, passwordVO inter
 }
 
 // FetchUserByID mocks base method.
-func (m *MockRepository) FetchUserByID(ctx context.Context, userIDVO uservo.ID) (*userdm.User, error) {
+func (m *MockRepository) FetchUserByID(ctx context.Context, userIDVO uservo.ID, withLock bool) (*userdm.User, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FetchUserByID", ctx, userIDVO)
+	ret := m.ctrl.Call(m, "FetchUserByID", ctx, userIDVO, withLock)
 	ret0, _ := ret[0].(*userdm.User)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FetchUserByID indicates an expected call of FetchUserByID.
-func (mr *MockRepositoryMockRecorder) FetchUserByID(ctx, userIDVO interface{}) *gomock.Call {
+func (mr *MockRepositoryMockRecorder) FetchUserByID(ctx, userIDVO, withLock interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchUserByID", reflect.TypeOf((*MockRepository)(nil).FetchUserByID), ctx, userIDVO)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchUserByID", reflect.TypeOf((*MockRepository)(nil).FetchUserByID), ctx, userIDVO, withLock)
 }
 
 // FetchUserIDByEmail mocks base method.
@@ -109,4 +109,18 @@ func (m *MockRepository) FetchUserIDByName(ctx context.Context, nameVO uservo.Na
 func (mr *MockRepositoryMockRecorder) FetchUserIDByName(ctx, nameVO interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FetchUserIDByName", reflect.TypeOf((*MockRepository)(nil).FetchUserIDByName), ctx, nameVO)
+}
+
+// UpdateUser mocks base method.
+func (m *MockRepository) UpdateUser(ctx context.Context, userEntity *userdm.User) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateUser", ctx, userEntity)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateUser indicates an expected call of UpdateUser.
+func (mr *MockRepositoryMockRecorder) UpdateUser(ctx, userEntity interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateUser", reflect.TypeOf((*MockRepository)(nil).UpdateUser), ctx, userEntity)
 }
