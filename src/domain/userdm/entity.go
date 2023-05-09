@@ -64,6 +64,10 @@ func (u *User) Name() uservo.Name {
 	return u.name
 }
 
+func (u *User) ChangeName(nameVO uservo.Name) {
+	u.name = nameVO
+}
+
 func (u *User) Birthday() sharedvo.AuditTime {
 	return u.birthday
 }
@@ -72,16 +76,32 @@ func (u *User) Gender() uservo.Gender {
 	return u.gender
 }
 
+func (u *User) ChangeGender(genderVO uservo.Gender) {
+	u.gender = genderVO
+}
+
 func (u *User) Address() uservo.Address {
 	return u.address
+}
+
+func (u *User) ChangeAddress(addressVO uservo.Address) {
+	u.address = addressVO
 }
 
 func (u *User) Email() uservo.Email {
 	return u.email
 }
 
+func (u *User) ChangeEmail(emailVO uservo.Email) {
+	u.email = emailVO
+}
+
 func (u *User) Password() uservo.Password {
 	return u.password
+}
+
+func (u *User) ChangePassword(passwordVO uservo.Password) {
+	u.password = passwordVO
 }
 
 func (u *User) Plan() uservo.Plan {
@@ -100,8 +120,16 @@ func (u *User) UpdatedAt() sharedvo.AuditTime {
 	return u.updatedAt
 }
 
+func (u *User) ChangeUpdatedAt(updatedAtVO sharedvo.AuditTime) {
+	u.updatedAt = updatedAtVO
+}
+
 func (u *User) UpdatedBy() uservo.ID {
 	return u.updatedBy
+}
+
+func (u *User) ChangeUpdatedBy(userIDVO uservo.ID) {
+	u.updatedBy = userIDVO
 }
 
 func (u *User) DeletedAt() *sharedvo.AuditTime {
