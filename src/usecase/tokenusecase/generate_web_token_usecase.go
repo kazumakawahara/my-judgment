@@ -33,13 +33,10 @@ func NewGenerateWebTokenUsecase(
 }
 
 func (u *generateWebTokenUsecase) GenerateWebToken(ctx context.Context, in *tokeninput.GenerateWebTokenInput) (*tokenoutput.GenerateWebTokenOutput, error) {
-	//userID, err := u.tokenService.ParseWebClientToken(in.ClientToken)
-	//if err != nil {
-	//	return nil, mjerr.Wrap(err)
-	//}
-
-	// TODO
-	userID := 1000
+	userID, err := u.tokenService.ParseWebClientToken(in.ClientToken)
+	if err != nil {
+		return nil, mjerr.Wrap(err)
+	}
 
 	userIDVO, err := uservo.NewID(userID)
 	if err != nil {
