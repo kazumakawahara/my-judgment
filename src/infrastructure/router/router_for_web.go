@@ -4,10 +4,13 @@ import (
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 
+	"my-judgment/infrastructure/auth/jwttoken"
 	"my-judgment/infrastructure/customcontext"
 	"my-judgment/infrastructure/middleware"
 	"my-judgment/infrastructure/rdb/persistence"
+	"my-judgment/interfaces/handler/tokenhandler"
 	"my-judgment/interfaces/handler/userhandler"
+	"my-judgment/usecase/tokenusecase"
 	"my-judgment/usecase/userusecase"
 )
 
@@ -21,6 +24,9 @@ func RouterForWebGroup(e *echo.Echo, db *gorm.DB) {
 		middleware.VerifyApiVersion(),
 	)
 
+	// トークン系
+	tokenRouterForWeb(mjRouterWithoutTokenAuth)
+
 	// ユーザー系
 	userRouterForWeb(mjRouterWithoutTokenAuth)
 
@@ -33,6 +39,19 @@ func RouterForWebGroup(e *echo.Echo, db *gorm.DB) {
 	//	middleware.VerifyApiVersion(),
 	//	middleware.VerifyToken(),
 	//)
+}
+
+func tokenRouterForWeb(mjRouter *echo.Group) {
+	tokenService := jwttoken.NewJwtTokenService()
+	userRepository := persistence.NewUserRepository()
+
+	// アクセストークン取得
+	generateWebTokenUsecase := tokenusecase.NewGenerateWebTokenUsecase(tokenService, userRepository)
+	generateWebTokenHandler := tokenhandler.NewGenerateWebTokenHandler(generateWebTokenUsecase)
+
+	mjRouter.GET("/token", func(c echo.Context) error {
+		return generateWebTokenHandler.GenerateWebToken(c.(*customcontext.CustomContext))
+	})
 }
 
 func userRouterForWeb(mjRouter *echo.Group) {

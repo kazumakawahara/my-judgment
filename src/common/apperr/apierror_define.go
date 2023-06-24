@@ -5,8 +5,9 @@ var (
 	InvalidParameter = newBadRequest("InvalidParameter")
 
 	// 401
-	TokenRequired = newUnauthorized("TokenRequired")
-	InvalidToken  = newUnauthorized("InvalidToken")
+	TokenRequired       = newUnauthorized("TokenRequired")
+	InvalidToken        = newUnauthorized("InvalidToken")
+	InvalidRequestToken = newUnauthorized("InvalidRequest")
 
 	// 404
 	MjUserNotFound = newNotFound("MjUserNotFound")
